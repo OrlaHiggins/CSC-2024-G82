@@ -90,6 +90,10 @@ public class SimpleBankingApp {
 	
     
 	public static void addTransaction(String account_number, double amount) { 
+		 if (accounts.stream().noneMatch(account -> account.getAccount_number().equals(account_number))) {
+		        System.out.println("Error: Account with number " + account_number + " does not exist.");
+		        return;
+		    }
 		Transaction aTransaction =  new Transaction(account_number, amount, Calendar.getInstance().getTime());
 		transactions.add(aTransaction);
 	}
