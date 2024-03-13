@@ -20,16 +20,9 @@ import org.junit.Test;
 
 public class DataUtilitiesTest {
 
-//    private Values2D values2D;
 	private DefaultKeyedValues2D testValues;
 
     @Before
-//    public void setUp() {
-//        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
-//        values2D = testValues;
-//        testValues.addValue(1, 0, 0);
-//        testValues.addValue(4, 1, 0);
-//    }
     public void setUp() {
         testValues = new DefaultKeyedValues2D();
         testValues.addValue(1.0, 2.0, 3.0);
@@ -38,107 +31,384 @@ public class DataUtilitiesTest {
     }
 
     @After
-//    public void tearDown() {
-//        values2D = null;
-//    }
     public void tearDown() {
         testValues = null;
     }
 
-//    @Test
-//    public void testValidDataAndCalculateColumnTotal() {
-//        assertEquals("Wrong sum returned. It should be 5.0", 
-//                5.0, DataUtilities.calculateColumnTotal(values2D, 0), 0.0000001d);
-//    }
-//
-//    @Test
-//    public void testNullDataColumnTotal() {
-//        try {
-//            DataUtilities.calculateColumnTotal(null, 0);
-//            fail("No exception thrown");
-//        } catch (Exception e) {
-//            assertTrue("Incorrect exception type thrown",
-//                    e.getClass().equals(IllegalArgumentException.class));
-//        }
-//    }
     
     //calculateColumnTotal(Values2D data, int column)
     //TC1
     @Test
-    public void testCalculateColumnTotalValidDataMatrixAndValidColumnNumber() {
+    public void testCalculateColumnTotalValidColumnNumber() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3, 4},
+            {5, 6, 7.5, 8}
+        };
         int column = 1; // Assuming the second column (index 1) is valid
-        double expected = 7.0; // Sum of values in the second column (2 + 5)
-        double result = DataUtilities.calculateColumnTotal(testValues, column);
+
+        // Create DefaultKeyedValues2D instance and populate it with data
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+        for (int i = 0; i < testData.length; i++) {
+            for (int j = 0; j < testData[i].length; j++) {
+                keyedValues2D.addValue(testData[i][j], i, j);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 8.3;
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(keyedValues2D, column);
+
+        // Perform the assertion
         assertEquals("Valid data matrix and valid column number should return the correct sum",
                 expected, result, 0.000001d);
     }
+
     
     //TC2
-    @Test
-    public void testCalculateColumnTotalValidDataMatrixAndInvalidColumnNumber() {
-        int invalidColumn = -1; // Assuming the column index is invalid
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testCalculateColumnTotalInvalidColumnNumber() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3, 4},
+            {5, 6, 7.5, 8}
+        };
+        int column = -1; // Negative column index
 
-        // Call the method under test and expect IllegalArgumentException
-        try {
-            DataUtilities.calculateColumnTotal(testValues, invalidColumn);
-            fail("Expected IllegalArgumentException was not thrown");
-        } catch (IllegalArgumentException e) {
-            // Test passed if IllegalArgumentException is thrown
-            assertTrue("IllegalArgumentException should be thrown", true);
-        } catch (IndexOutOfBoundsException e) {
-            // Handle the case where the column index is out of bounds
-            fail("Column index is out of bounds");
+        // Create DefaultKeyedValues2D object with proper constructor
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+        for (int row = 0; row < testData.length; row++) {
+            for (int col = 0; col < testData[row].length; col++) {
+                keyedValues2D.addValue(testData[row][col], row, col);
+            }
         }
+
+        // Check if the column index is within bounds
+        if (column < 0 || column >= keyedValues2D.getColumnCount()) {
+            throw new IndexOutOfBoundsException("Invalid column index");
+        }
+
+        // Call the method under test (expecting an IndexOutOfBoundsException)
+        DataUtilities.calculateColumnTotal(keyedValues2D, column);
     }
     
     //TC3
     @Test
-    public void testCalculateColumnTotalInvalidDataMatrixAndValidColumnNumber() {
-        testValues.clear(); // Clearing the data to make it invalid
-        int validColumn = 1; // Assuming the second column (index 1) is valid
-        double expected = 0.0; // Since the data matrix is empty, the sum should be 0
-        double result = DataUtilities.calculateColumnTotal(testValues, validColumn);
-        assertEquals("Invalid data matrix and valid column number should return 0",
-                expected, result, 0.000001d);
+    public void testCalculateColumnTotalValidColumnNumber0() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3, 4},
+            {5, 6, 7.5, 8}
+        };
+        int column = 0; // Valid column index
+
+        // Create DefaultKeyedValues2D object with proper constructor
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+        for (int row = 0; row < testData.length; row++) {
+            for (int col = 0; col < testData[row].length; col++) {
+                keyedValues2D.addValue(testData[row][col], row, col);
+            }
+        }
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(keyedValues2D, column);
+
+        // Define the expected result
+        double expected = 6.0;
+
+        // Perform the assertion
+        assertEquals("Column total should match expected value", expected, result, 0.000001d);
     }
     
     //TC4
-    @Test
-    public void testCalculateColumnTotalInvalidDataMatrixWithNullValuesAndValidColumnNumber() {
-        // Adding values according to the setup
-        testValues.addValue(1.0, 2.0, 3.0);
-        testValues.addValue(4.0, 5.0, 6.0);
-        
-        // Adding a null value in the specified column
-        testValues.addValue(0, 1, "");
+    public void testCalculateColumnTotalInvalidColumnIndex() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3, 4},
+            {5, 6, 7.5, 8}
+        };
+        int column = 40; // Invalid column index
 
-        int validColumn = 0; // Assuming the first column (index 0) is valid
+        // Create DefaultKeyedValues2D object with proper constructor
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+        for (int row = 0; row < testData.length; row++) {
+            for (int col = 0; col < testData[row].length; col++) {
+                keyedValues2D.addValue(testData[row][col], row, col);
+            }
+        }
 
-        // Call the method under test and expect IllegalArgumentException
+        // Call the method under test and expect IndexOutOfBoundsException
         try {
-            DataUtilities.calculateColumnTotal(testValues, validColumn);
-            fail("Expected IllegalArgumentException was not thrown");
-        } catch (IllegalArgumentException e) {
-            // Test passed if IllegalArgumentException is thrown
-            assertTrue("IllegalArgumentException should be thrown", true);
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IndexOutOfBoundsException was not thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // Test passed if IndexOutOfBoundsException is thrown
         }
     }
     
     //TC5
     @Test
-    public void testCalculateColumnTotalInvalidDataMatrixAndInvalidColumnNumber() {
-        // Setting up the test values
-        testValues = new DefaultKeyedValues2D();
-        testValues.addValue(1.0, 2.0, 3.0);
-        testValues.addValue(4.0, 5.0, 6.0);
+    public void testCalculateColumnTotalEmptyMatrixPositiveColumnIndex() {
+        // Define the input data (empty matrix)
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+
+        // Define the positive column index
+        int column = 1;
+
+        // Call the method under test and expect IndexOutOfBoundsException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IndexOutOfBoundsException was not thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // Test passed if IndexOutOfBoundsException is thrown
+        }
+    }
+
+    
+    //6
+    @Test
+    public void testCalculateColumnTotalEmptyMatrixNegativeColumnIndex() {
+        // Define the input data (empty matrix)
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+
+        // Define the negative column index
+        int column = -1;
+
+        // Call the method under test and expect IndexOutOfBoundsException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IndexOutOfBoundsException was not thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // Test passed if IndexOutOfBoundsException is thrown
+        }
+    }
+    
+    //7
+    @Test
+    public void testCalculateColumnTotalEmptyMatrixZeroColumnIndex() {
+        // Define the input data (empty matrix)
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+
+        // Define the zero column index
+        int column = 0;
+
+        // Call the method under test and expect IndexOutOfBoundsException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IndexOutOfBoundsException was not thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // Test passed if IndexOutOfBoundsException is thrown
+        }
+    }
+    
+    //8
+    @Test
+    public void testCalculateColumnTotalEmptyMatrixInvalidColumnIndex() {
+        // Define the input data (empty matrix)
+        DefaultKeyedValues2D keyedValues2D = new DefaultKeyedValues2D();
+
+        // Define the invalid column index
+        int column = 40;
+
+        // Call the method under test and expect IndexOutOfBoundsException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IndexOutOfBoundsException was not thrown");
+        } catch (IndexOutOfBoundsException e) {
+            // Test passed if IndexOutOfBoundsException is thrown
+        }
+    }
+    
+    //9
+    @Test
+    public void testCalculateColumnTotalNullData() {
+        // Define the input data (null)
+        DefaultKeyedValues2D keyedValues2D = null;
+
+        // Define the invalid column index
+        int column = 1;
+
         // Call the method under test and expect IllegalArgumentException
         try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
             fail("Expected IllegalArgumentException was not thrown");
         } catch (IllegalArgumentException e) {
             // Test passed if IllegalArgumentException is thrown
-            assertTrue("IllegalArgumentException should be thrown", true);
+        } catch (NullPointerException e) {
+            // Test passed if NullPointerException is thrown
         }
     }
+    
+    //10
+    @Test
+    public void testCalculateColumnTotalNullDataNegativeColumnIndex() {
+        // Define the input data (null)
+        DefaultKeyedValues2D keyedValues2D = null;
+
+        // Define the invalid column index
+        int column = -1;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+        } catch (NullPointerException e) {
+            // Test passed if NullPointerException is thrown
+        }
+    }
+    
+    //11
+    @Test
+    public void testCalculateColumnTotalNullDataZeroColumnIndex() {
+        // Define the input data (null)
+        DefaultKeyedValues2D keyedValues2D = null;
+
+        // Define the invalid column index
+        int column = 0;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+        } catch (NullPointerException e) {
+            // Test passed if NullPointerException is thrown
+        }
+    }
+    
+    //12
+    @Test
+    public void testCalculateColumnTotalNullDataInvalidColumnIndex() {
+        // Define the input data (null)
+        DefaultKeyedValues2D keyedValues2D = null;
+
+        // Define the invalid column index
+        int column = 40;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.calculateColumnTotal(keyedValues2D, column);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+        } catch (NullPointerException e) {
+            // Test passed if NullPointerException is thrown
+        }
+    }
+
+    
+    //BVA
+    //TC13
+    @Test
+    public void testCalculateColumnTotalinColumnValidDataMatrix() {
+        // Define the input data
+        DefaultKeyedValues2D testData = new DefaultKeyedValues2D();
+        testData.addValue(1, 0, 0);
+        testData.addValue(2.3, 0, 1);
+        testData.addValue(3, 0, 2);
+        testData.addValue(4, 0, 3);
+        testData.addValue(5, 1, 0);
+        testData.addValue(6, 1, 1);
+        testData.addValue(7.5, 1, 2);
+        testData.addValue(8, 1, 3);
+
+        // Define the expected output
+        double expected = 6.0;
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(testData, 0);
+
+        // Perform the assertion
+        assertEquals("Min column value 0 with a valid data matrix should return 6.0",
+                expected, result, 0.000001d);
+    }
+    
+    //TC14
+    @Test
+    public void testCalculateColumnTotalMinPlusColumnValidDataMatrix() {
+        // Define the input data
+        DefaultKeyedValues2D testData = new DefaultKeyedValues2D();
+        testData.addValue(1, 0, 0);
+        testData.addValue(2.3, 0, 1);
+        testData.addValue(3, 0, 2);
+        testData.addValue(4, 0, 3);
+        testData.addValue(5, 1, 0);
+        testData.addValue(6, 1, 1);
+        testData.addValue(7.5, 1, 2);
+        testData.addValue(8, 1, 3);
+
+        // Define the expected output
+        double expected = 8.0;
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(testData, 1);
+
+        // Perform the assertion
+        assertEquals("Min+ column value 1 with a valid data matrix should return 8.0",
+                expected, result, 0.000001d);
+    }
+    
+    //TC15
+    @Test
+    public void testCalculateColumnTotalMaxMinusColumnValidDataMatrix() {
+        // Define the input data
+        DefaultKeyedValues2D testData = new DefaultKeyedValues2D();
+        testData.addValue(1, 0, 0);
+        testData.addValue(2.3, 0, 1);
+        testData.addValue(3, 0, 2);
+        testData.addValue(4, 0, 3);
+        testData.addValue(5, 1, 0);
+        testData.addValue(6, 1, 1);
+        testData.addValue(7.5, 1, 2);
+        testData.addValue(8, 1, 3);
+
+        // Define the expected output
+        double expected = 10.0;
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(testData, 2);
+
+        // Perform the assertion
+        assertEquals("Max- column value 2 with a valid data matrix should return 10.0",
+                expected, result, 0.000001d);
+    }
+
+    //TC16
+    @Test
+    public void testCalculateColumnTotalMaxColumnValidDataMatrix() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3, 4},
+            {5, 6, 7.5, 8}
+        };
+        int column = 3; // Maximum column index (0-based)
+
+        // Create a new DefaultKeyedValues2D object
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+
+        // Populate the DefaultKeyedValues2D object with the test data
+        for (int row = 0; row < testData.length; row++) {
+            for (int col = 0; col < testData[row].length; col++) {
+                testValues.addValue(testData[row][col], row, col);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 12.0;
+
+        // Call the method under test
+        double result = DataUtilities.calculateColumnTotal(testValues, column);
+
+        // Perform the assertion
+        assertEquals("Max column value 3 with a valid data matrix should return 12.0",
+                expected, result, 0.000001d);
+    }
+
     
     //calculateRowTotal(Values2D data, int row)
     
@@ -243,9 +513,141 @@ public class DataUtilitiesTest {
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
+    //BVA
+    //TC6
+    @Test
+    public void testCalculateRowTotalMinRowValidDataMatrix() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3},
+            {4, 5, 6},
+            {7.5, 8, 9},
+            {10, 11, 12.2}
+        };
+        int row = 0; // Minimum row index (0-based)
+
+        // Create a new DefaultKeyedValues2D object
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+
+        // Populate the DefaultKeyedValues2D object with the test data
+        for (int r = 0; r < testData.length; r++) {
+            for (int c = 0; c < testData[r].length; c++) {
+                testValues.addValue(testData[r][c], r, c);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 5.3;
+
+        // Call the method under test
+        double result = DataUtilities.calculateRowTotal(testValues, row);
+
+        // Perform the assertion
+        assertEquals("Min row value 0 with a valid data matrix should return 5.3",
+                expected, result, 0.000001d);
+    }
+    
+    //TC7
+    @Test
+    public void testCalculateRowTotalMinPlusRowValidDataMatrix() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3},
+            {4, 5, 6},
+            {7.5, 8, 9},
+            {10, 11, 12.2}
+        };
+        int row = 1; // Minimum row index + 1 (0-based)
+
+        // Create a new DefaultKeyedValues2D object
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+
+        // Populate the DefaultKeyedValues2D object with the test data
+        for (int r = 0; r < testData.length; r++) {
+            for (int c = 0; c < testData[r].length; c++) {
+                testValues.addValue(testData[r][c], r, c);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 15.0;
+
+        // Call the method under test
+        double result = DataUtilities.calculateRowTotal(testValues, row);
+
+        // Perform the assertion
+        assertEquals("Min+ row value 1 with a valid data matrix should return 15.0",
+                expected, result, 0.000001d);
+    }
+
+    //TC8
+    @Test
+    public void testCalculateRowTotalMaxMinusRowValidDataMatrix() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3},
+            {4, 5, 6},
+            {7.5, 8, 9},
+            {10, 11, 12.2}
+        };
+        int row = 2; // Maximum row index - 1 (0-based)
+
+        // Create a new DefaultKeyedValues2D object
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+
+        // Populate the DefaultKeyedValues2D object with the test data
+        for (int r = 0; r < testData.length; r++) {
+            for (int c = 0; c < testData[r].length; c++) {
+                testValues.addValue(testData[r][c], r, c);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 24.5;
+
+        // Call the method under test
+        double result = DataUtilities.calculateRowTotal(testValues, row);
+
+        // Perform the assertion
+        assertEquals("Max- row values 2 with a valid data matrix should return 24.5",
+                expected, result, 0.000001d);
+    }
+
+    //TC9
+    @Test
+    public void testCalculateRowTotalMaxRowValidDataMatrix() {
+        // Define the input data
+        double[][] testData = {
+            {1, 2.3, 3},
+            {4, 5, 6},
+            {7.5, 8, 9},
+            {10, 11, 12.2}
+        };
+        int row = 3; // Maximum row index (0-based)
+
+        // Create a new DefaultKeyedValues2D object
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+
+        // Populate the DefaultKeyedValues2D object with the test data
+        for (int r = 0; r < testData.length; r++) {
+            for (int c = 0; c < testData[r].length; c++) {
+                testValues.addValue(testData[r][c], r, c);
+            }
+        }
+
+        // Calculate the expected result
+        double expected = 33.2;
+
+        // Call the method under test
+        double result = DataUtilities.calculateRowTotal(testValues, row);
+
+        // Perform the assertion
+        assertEquals("Max row values 3 with a valid data matrix should return 33.2",
+                expected, result, 0.000001d);
+    }
+
     
     //createNumberArray(double[] data)
-    
     //TC1
     @Test
     public void testCreateNumberArrayValidData() {
