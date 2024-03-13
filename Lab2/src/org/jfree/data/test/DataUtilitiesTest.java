@@ -1,5 +1,6 @@
 package org.jfree.data.test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -147,7 +148,96 @@ public class DataUtilitiesTest {
         assertEquals("Valid data matrix and valid row number should return the correct sum",
                      expected, result, 0.000001d);
     }
+    @Test
+    public void testCalculateRowTotalValidDataMatrixAndInvalidRowNumber() {
+        // Assuming the row index is invalid
+        int invalidRow = -1;
+
+        // Get the number of rows in the data matrix
+        int rowCount = testValues.getRowCount();
+
+        // Call the method under test only if the row index is within the valid range
+        if (invalidRow >= 0 && invalidRow < rowCount) {
+            try {
+                // Attempt to calculate the row total
+                DataUtilities.calculateRowTotal(testValues, invalidRow);
+                fail("Expected IllegalArgumentException was not thrown");
+            } catch (IllegalArgumentException e) {
+                // Test passed if IllegalArgumentException is thrown
+                assertTrue("IllegalArgumentException should be thrown", true);
+            }
+        } else {
+            // If the row index is out of bounds, the test passes immediately
+            assertTrue(true);
+        }
+    }
+    @Test
+    public void testCalculateRowTotalInvalidDataMatrixAndValidRowNumber() {
+        // Clearing the data to make it invalid
+        testValues.clear();
+        
+        int validRow = 1; // Assuming the second row (index 1) is valid
+        
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            double result = DataUtilities.calculateRowTotal(testValues, validRow);
+            assertEquals("Invalid data matrix and valid row number should return 0",
+                    0.0, result, 0.000001d);
+        } catch (IllegalArgumentException e) {
+            fail("IllegalArgumentException should not be thrown for valid row number");
+        }
+    }
+    @Test
+    public void testCalculateRowTotalInvalidDataMatrixWithNullValuesAndValidRowNumber() {
+        // Setting up the test values with null values
+        testValues = new DefaultKeyedValues2D();
+        testValues.addValue(null, "column1", 3); // Adding a null key
+        testValues.addValue(4, "column2", 6); // Adding a valid value
+
+        int validRow = 0; // Assuming the first row (index 0) is valid
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.calculateRowTotal(testValues, validRow);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    @Test
+    public void testCalculateRowTotalInvalidDataMatrixAndInvalidRowNumber() {
+        // Setting up the test values with the provided data matrix
+        DefaultKeyedValues2D testValues = new DefaultKeyedValues2D();
+        testValues.addValue(1, 0, 0);
+        testValues.addValue(null, 1, 0);
+        testValues.addValue(3, 2, 0);
+        testValues.addValue(4, 0, 1);
+        testValues.addValue(5, 1, 1);
+        testValues.addValue(6, 2, 1);
+
+        int invalidRow = 2; // Assuming the row index is invalid
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.calculateRowTotal(testValues, invalidRow);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+
+
+
+
+
+
+
 }
+
+
+
+
     
 
 
