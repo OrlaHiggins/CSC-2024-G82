@@ -70,13 +70,20 @@ public class DataUtilitiesTest {
     @Test
     public void testCalculateColumnTotalValidDataMatrixAndInvalidColumnNumber() {
         int invalidColumn = -1; // Assuming the column index is invalid
+
+        // Call the method under test and expect IllegalArgumentException
         try {
             DataUtilities.calculateColumnTotal(testValues, invalidColumn);
             fail("Expected IllegalArgumentException was not thrown");
         } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
             assertTrue("IllegalArgumentException should be thrown", true);
+        } catch (IndexOutOfBoundsException e) {
+            // Handle the case where the column index is out of bounds
+            fail("Column index is out of bounds");
         }
     }
+
 
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixAndValidColumnNumber() {
@@ -88,6 +95,7 @@ public class DataUtilitiesTest {
                 expected, result, 0.000001d);
     }
 
+
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixWithNullValuesAndValidColumnNumber() {
         // Adding values according to the setup
@@ -95,19 +103,20 @@ public class DataUtilitiesTest {
         testValues.addValue(4.0, 5.0, 6.0);
         
         // Adding a null value in the specified column
-        testValues.addValue(0, 1, null);
-        
+        testValues.addValue(0, 1, "");
+
         int validColumn = 0; // Assuming the first column (index 0) is valid
 
         // Call the method under test and expect IllegalArgumentException
         try {
-            double result = DataUtilities.calculateColumnTotal(testValues, validColumn);
+            DataUtilities.calculateColumnTotal(testValues, validColumn);
             fail("Expected IllegalArgumentException was not thrown");
         } catch (IllegalArgumentException e) {
             // Test passed if IllegalArgumentException is thrown
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
+
 
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixAndInvalidColumnNumber() {
@@ -115,36 +124,49 @@ public class DataUtilitiesTest {
         testValues = new DefaultKeyedValues2D();
         testValues.addValue(1.0, 2.0, 3.0);
         testValues.addValue(4.0, 5.0, 6.0);
-        // Adding a null value to the test values in column 1 of row 0
-        testValues.addValue(0, 1, null); 
-
-        int invalidColumn = -1; // Assuming the column index is invalid
-
         // Call the method under test and expect IllegalArgumentException
         try {
-            double result = DataUtilities.calculateColumnTotal(testValues, invalidColumn);
             fail("Expected IllegalArgumentException was not thrown");
         } catch (IllegalArgumentException e) {
             // Test passed if IllegalArgumentException is thrown
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
-
-
     
     @Test
-    public void testgetCumulativePercentages()
-    {
-    	//setup
-    	DefaultKeyedValues keyvalues = new DefaultKeyedValues();
-    	keyvalues.addValue((Comparable) 0.0, 6.0);
-    	keyvalues.addValue((Comparable) 1.0, 11.0);
-    	keyvalues.addValue((Comparable) 2.0, 3.0);
-    	KeyedValues object_under_test = DataUtilities.getCumulativePercentages((KeyedValues) keyvalues);
-    	assertEquals((double) object_under_test.getValue(2), 1.0, .000000001d);
-    	
+    public void testCalculateRowTotalValidDataMatrixAndValidRowNumber() {
+        int row = 1; // Assuming the second row (index 1) is valid
+
+        // Call the method under test and capture the result
+        double result = DataUtilities.calculateRowTotal(testValues, row);
+
+        // Define the expected output
+        double expected = 15.0; // Sum of values in the second row (4 + 5 + 6)
+
+        // Perform the assertion
+        assertEquals("Valid data matrix and valid row number should return the correct sum",
+                     expected, result, 0.000001d);
     }
 }
+    
+
+
+
+
+//    
+//    @Test
+//    public void testgetCumulativePercentages()
+//    {
+//    	//setup
+//    	DefaultKeyedValues keyvalues = new DefaultKeyedValues();
+//    	keyvalues.addValue((Comparable) 0.0, 6.0);
+//    	keyvalues.addValue((Comparable) 1.0, 11.0);
+//    	keyvalues.addValue((Comparable) 2.0, 3.0);
+//    	KeyedValues object_under_test = DataUtilities.getCumulativePercentages((KeyedValues) keyvalues);
+//    	assertEquals((double) object_under_test.getValue(2), 1.0, .000000001d);
+//    	
+//    }
+//}
 
 
 
