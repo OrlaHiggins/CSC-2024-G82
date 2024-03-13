@@ -2,8 +2,11 @@ package org.jfree.data.test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Arrays;
 
 import org.jfree.data.DataUtilities;
 import org.jfree.data.DefaultKeyedValues;
@@ -59,6 +62,8 @@ public class DataUtilitiesTest {
 //        }
 //    }
     
+    //calculateColumnTotal(Values2D data, int column)
+    //TC1
     @Test
     public void testCalculateColumnTotalValidDataMatrixAndValidColumnNumber() {
         int column = 1; // Assuming the second column (index 1) is valid
@@ -67,7 +72,8 @@ public class DataUtilitiesTest {
         assertEquals("Valid data matrix and valid column number should return the correct sum",
                 expected, result, 0.000001d);
     }
-
+    
+    //TC2
     @Test
     public void testCalculateColumnTotalValidDataMatrixAndInvalidColumnNumber() {
         int invalidColumn = -1; // Assuming the column index is invalid
@@ -84,8 +90,8 @@ public class DataUtilitiesTest {
             fail("Column index is out of bounds");
         }
     }
-
-
+    
+    //TC3
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixAndValidColumnNumber() {
         testValues.clear(); // Clearing the data to make it invalid
@@ -95,8 +101,8 @@ public class DataUtilitiesTest {
         assertEquals("Invalid data matrix and valid column number should return 0",
                 expected, result, 0.000001d);
     }
-
-
+    
+    //TC4
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixWithNullValuesAndValidColumnNumber() {
         // Adding values according to the setup
@@ -117,8 +123,8 @@ public class DataUtilitiesTest {
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
-
-
+    
+    //TC5
     @Test
     public void testCalculateColumnTotalInvalidDataMatrixAndInvalidColumnNumber() {
         // Setting up the test values
@@ -134,6 +140,9 @@ public class DataUtilitiesTest {
         }
     }
     
+    //calculateRowTotal(Values2D data, int row)
+    
+    //TC1
     @Test
     public void testCalculateRowTotalValidDataMatrixAndValidRowNumber() {
         int row = 1; // Assuming the second row (index 1) is valid
@@ -148,6 +157,8 @@ public class DataUtilitiesTest {
         assertEquals("Valid data matrix and valid row number should return the correct sum",
                      expected, result, 0.000001d);
     }
+    
+    //TC2
     @Test
     public void testCalculateRowTotalValidDataMatrixAndInvalidRowNumber() {
         // Assuming the row index is invalid
@@ -171,6 +182,8 @@ public class DataUtilitiesTest {
             assertTrue(true);
         }
     }
+    
+    //TC3
     @Test
     public void testCalculateRowTotalInvalidDataMatrixAndValidRowNumber() {
         // Clearing the data to make it invalid
@@ -187,6 +200,8 @@ public class DataUtilitiesTest {
             fail("IllegalArgumentException should not be thrown for valid row number");
         }
     }
+    
+    //TC4
     @Test
     public void testCalculateRowTotalInvalidDataMatrixWithNullValuesAndValidRowNumber() {
         // Setting up the test values with null values
@@ -204,6 +219,8 @@ public class DataUtilitiesTest {
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
+    
+    //TC5
     @Test
     public void testCalculateRowTotalInvalidDataMatrixAndInvalidRowNumber() {
         // Setting up the test values with the provided data matrix
@@ -226,10 +243,231 @@ public class DataUtilitiesTest {
             assertTrue("IllegalArgumentException should be thrown", true);
         }
     }
+    
+    //createNumberArray(double[] data)
+    
+    //TC1
+    @Test
+    public void testCreateNumberArrayValidData() {
+        // Define the input data
+        double[] data = {1.0, 2.5, 3.7, 4.2};
 
+        // Call the method under test
+        Number[] result = DataUtilities.createNumberArray(data);
 
+        // Check if the result array is null
+        assertNotNull("Result array should not be null", result);
 
+        // Convert the result array to double for comparison
+        double[] resultArray = new double[result.length];
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == null) {
+                System.out.println("Null value found at index " + i);
+            } else {
+                resultArray[i] = result[i].doubleValue();
+            }
+        }
 
+        // Print the result array for diagnosis
+        System.out.println("Result array: " + Arrays.toString(resultArray));
+
+        // Define the expected output
+        double[] expected = {1.0, 2.5, 3.7, 4.2};
+
+        // Perform the assertion
+        assertArrayEquals("Valid array of double values should be returned", expected, resultArray, 0.000001d);
+    }
+    
+    //TC2
+    @Test
+    public void testCreateNumberArrayInvalidEmptyData() {
+        // Define the input data as an empty array
+        double[] data = {};
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray(data);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC3
+    @Test
+    public void testCreateNumberArrayInvalidNullData() {
+        // Define the input data as null
+        double[] data = null;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray(data);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC4
+    @Test
+    public void testCreateNumberArrayNonNumericValues() {
+        // Define the input data with non-numeric values
+        double[] data = {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray(data);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //createNumberArray2D(double[][] data)
+    
+    //TC1
+    @Test
+    public void testCreateNumberArray2DValidData() {
+        // Define the input data as a valid 2D array of double values
+        double[][] data = {{1.0, 2.5}, {3.7, 4.2}};
+        
+        // Call the method under test
+        Number[][] result = DataUtilities.createNumberArray2D(data);
+        
+        // Verify that the returned array matches the expected array
+        assertArrayEquals("Valid 2D array of double values", data, result);
+    }
+    
+    //TC2
+    @Test
+    public void testCreateNumberArray2DEmptyData() {
+        // Define the input data as an empty array
+        double[][] data = new double[0][0];
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray2D(data);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC3
+    @Test
+    public void testCreateNumberArray2DNullData() {
+        // Define the input data as null
+        double[][] data = null;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray2D(data);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC4
+    @Test
+    public void testCreateNumberArray2DNonNumericData() {
+        // Define the input data with non-numeric values (NaN)
+        double[][] nonNumericData = {
+            {Double.NaN, Double.NaN},
+            {Double.NaN, Double.NaN}
+        };
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.createNumberArray2D(nonNumericData);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //getCumulativePercentages(KeyedValues data)
+    //TC1
+    @Test
+    public void testGetCumulativePercentagesValidKeyedValuesCollection() {
+        // Define the input data
+        DefaultKeyedValues keyValues = new DefaultKeyedValues();
+        keyValues.addValue("A", 10);
+        keyValues.addValue("B", 20);
+        keyValues.addValue("C", 30);
+        keyValues.addValue("D", 40);
+
+        // Call the method under test
+        KeyedValues result = DataUtilities.getCumulativePercentages(keyValues);
+
+        // Define the expected output
+        DefaultKeyedValues expected = new DefaultKeyedValues();
+        expected.addValue("A", 10.0);
+        expected.addValue("B", 30.0);
+        expected.addValue("C", 60.0);
+        expected.addValue("D", 100.0);
+
+        // Perform the assertion
+        assertEquals("Cumulative percentages should match the expected values",
+                expected, result);
+    }
+    
+    //TC2
+    @Test
+    public void testGetCumulativePercentages_EmptyKeyedValuesCollection() {
+        // Define the input data as an empty keyed values collection
+        DefaultKeyedValues keyValues = new DefaultKeyedValues();
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.getCumulativePercentages(keyValues);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC3
+    @Test
+    public void testGetCumulativePercentages_NullKeyedValuesCollection() {
+        // Define the input data as null keyed values collection
+        DefaultKeyedValues keyValues = null;
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.getCumulativePercentages(keyValues);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
+    
+    //TC4
+    @Test
+    public void testGetCumulativePercentages_NonNumericKeyedValues() {
+        // Define the input data with non-numeric values
+        DefaultKeyedValues keyValues = new DefaultKeyedValues();
+        keyValues.addValue("A", 10.0); // Using double values instead of strings
+        keyValues.addValue("B", 20.0);
+        keyValues.addValue("C", 30.0);
+
+        // Call the method under test and expect IllegalArgumentException
+        try {
+            DataUtilities.getCumulativePercentages(keyValues);
+            fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passed if IllegalArgumentException is thrown
+            assertTrue("IllegalArgumentException should be thrown", true);
+        }
+    }
 
 
 
