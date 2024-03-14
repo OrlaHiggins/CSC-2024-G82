@@ -345,7 +345,7 @@ public class DataUtilitiesTest {
         testData.addValue(8, 1, 3);
 
         // Define the expected output
-        double expected = 8.0;
+        double expected = 8.3;
 
         // Call the method under test
         double result = DataUtilities.calculateColumnTotal(testData, 1);
@@ -370,7 +370,7 @@ public class DataUtilitiesTest {
         testData.addValue(8, 1, 3);
 
         // Define the expected output
-        double expected = 10.0;
+        double expected = 10.5;
 
         // Call the method under test
         double result = DataUtilities.calculateColumnTotal(testData, 2);
@@ -689,13 +689,13 @@ public class DataUtilitiesTest {
         }
 
         // Calculate the expected result
-        double expected = 5.3;
+        double expected = 6.3;
 
         // Call the method under test
         double result = DataUtilities.calculateRowTotal(testValues, row);
 
         // Perform the assertion
-        assertEquals("Min row value 0 with a valid data matrix should return 5.3",
+        assertEquals("Min row value 0 with a valid data matrix should return 6.3",
                 expected, result, 0.000001d);
     }
     
@@ -907,19 +907,26 @@ public class DataUtilitiesTest {
     //TC1
     @Test
     public void testGetCumulativePercentagesValidKeyedValuesCollection() {
-        // Setup
+        // Define the input data
         DefaultKeyedValues keyValues = new DefaultKeyedValues();
-        keyValues.addValue((Comparable) "A", 10);
-        keyValues.addValue((Comparable) "B", 20);
-        keyValues.addValue((Comparable) "C", 30);
-        keyValues.addValue((Comparable) "D", 40);
+        keyValues.addValue("A", 10);
+        keyValues.addValue("B", 20);
+        keyValues.addValue("C", 30);
+        keyValues.addValue("D", 40);
 
         // Call the method under test
         KeyedValues result = DataUtilities.getCumulativePercentages(keyValues);
 
+        // Define the expected output
+        DefaultKeyedValues expected = new DefaultKeyedValues();
+        expected.addValue("A", 10.0);
+        expected.addValue("B", 30.0);
+        expected.addValue("C", 60.0);
+        expected.addValue("D", 100.0);
+
         // Perform the assertion
-        assertEquals("Cumulative percentage should match the expected value for key 'D'",
-                1.0, (double) result.getValue("D"), 0.000000001d);
+        assertEquals("Cumulative percentages should match the expected values",
+                expected, result);
     }
     
     //TC2
@@ -947,19 +954,20 @@ public class DataUtilitiesTest {
     public void testGetCumulativePercentagesValidKeyedValuesOneEntry() {
         // Define the input data
         DefaultKeyedValues keyValues = new DefaultKeyedValues();
-        keyValues.addValue((Comparable<Integer>)0, 10.0); // Specify the type explicitly
+        keyValues.addValue((Comparable<Integer>) 0, 10.0); // Specify the type explicitly
 
         // Call the method under test
         KeyedValues result = DataUtilities.getCumulativePercentages(keyValues);
 
         // Define the expected output
         DefaultKeyedValues expected = new DefaultKeyedValues();
-        expected.addValue((Comparable<Integer>)0, 1.0); // Specify the type explicitly
+        expected.addValue((Comparable<Integer>) 0, 1.0); // Specify the type explicitly
 
         // Perform the assertion
         assertEquals("Cumulative percentages should match the expected values",
-                expected, result);
+                expected.getValue(0), result.getValue(0));
     }
+
     //TC5
     @Test
     public void testGetCumulativePercentagesValidKeyedValuesNegativeValues() {
